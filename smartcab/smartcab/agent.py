@@ -4,6 +4,7 @@ from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
 
+
 class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """ 
@@ -43,10 +44,12 @@ class LearningAgent(Agent):
             self.epsilon = 0
             self.alpha = 0
         else:
-            # self.epsilon -= 0.05
-            # self.epsilon = self.alpha ** self.testCount
-            # self.epsilon = float(1) / float(self.testCount ** 2)
-            self.epsilon = math.cos(self.alpha * self.testCount)
+            #self.epsilon = 1 - (math.exp(-80 * math.exp(-0.1 * self.testCount)))
+            #self.alpha = 0.73
+
+            self.epsilon = 1 - (math.exp(-40 * math.exp(-0.1 * self.testCount)))
+            self.alpha = 0.73
+
             self.testCount += 1
         return None
 
@@ -84,7 +87,7 @@ class LearningAgent(Agent):
         ###########
         # Calculate the maximum Q-value of all actions for a given state
 
-        maxQ = None
+        maxQ = max(self.Q[state].values())
 
         return maxQ 
 
@@ -97,7 +100,7 @@ class LearningAgent(Agent):
         ###########
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
-        if state not in self.Q:
+        if state not in self.Q and self.learning:
             self.Q[state] = dict()
             #   Then, for each action available, set the initial Q-value to 0.0
             for act in self.env.valid_actions:
@@ -145,8 +148,8 @@ class LearningAgent(Agent):
 
         #   state = (waypoint, inputs), Q[s][a] = (1 - alpha) * Q[s][a] + alpha * reward
         if self.learning == True:
-            next_state = self.build_state()
-            self.createQ(next_state)
+            #next_state = self.build_state()
+            #self.createQ(next_state)
             self.Q[state][action] = (1- self.alpha) * self.Q[state][action] + self.alpha * reward
         return
 
